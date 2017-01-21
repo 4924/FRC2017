@@ -9,7 +9,7 @@ class MyRobot(wpilib.IterativeRobot):
         should be used for any initialization code.
         """
         self.robot_drive = wpilib.RobotDrive(0,1)
-        self.stick = wpilib.Joystick(1)
+        self.stick = wpilib.Joystick(0)
 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -27,7 +27,7 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        self.robot_drive.arcadeDrive(self.stick.GetY(),self.stick.GetX())
+        self.robot_drive.arcadeDrive(self.stick.getY(),self.stick.getX())
 
     def testPeriodic(self):
         """This function is called periodically during test mode."""
