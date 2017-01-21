@@ -10,6 +10,8 @@ class MyRobot(wpilib.IterativeRobot):
         """
         self.robot_drive = wpilib.RobotDrive(0,1)
         self.stick = wpilib.Joystick(0)
+        self.rawButton = True
+        self.robotSpeed = False
 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -27,7 +29,21 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        self.robot_drive.arcadeDrive(self.stick.getY(),self.stick.getX())
+        
+        if(self.stick.getRawButton(0) and self.rawButton == True):
+            #clicked and value is true
+            self.robotSpeed = !self.robotSpeed
+            self.rawButton = False
+        elif(self.stick.getRawButton(0) and self.rawButton == False):
+            #clicked and value is false        
+        elif(!self.stick.getRawButton(0) and self.rawButton == False):
+            #not clicked and value is true
+            self.rawButton = True
+        
+        if(self.robotSpeed):
+            self.robot_drive.arcadeDrive(self.stick.getY(),self.stick.getX()) 
+        else: 
+            self.robot_drive.arcadeDrive(self.stick.getY()/2,self.stick.getX()/2)
 
     def testPeriodic(self):
         """This function is called periodically during test mode."""
