@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-    This is a good foundation to build your robot code on
-"""
-
 import wpilib
 
 class MyRobot(wpilib.IterativeRobot):
@@ -31,7 +27,7 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        self.robot_drive.arcadeDrive(self.stick)
+        self.robot_drive.arcadeDrive(self.stick.GetY(),self.stick.GetX())
 
     def testPeriodic(self):
         """This function is called periodically during test mode."""
