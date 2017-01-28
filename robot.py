@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import wpilib
-#from networktables import NetworkTable
-#from networktables.util import ntproperty
+from networktables import NetworkTables
+
+
 
 class MyRobot(wpilib.IterativeRobot):
 
@@ -10,7 +11,7 @@ class MyRobot(wpilib.IterativeRobot):
         This function is called upon program startup and
         should be used for any initialization code.
         """
-        #table = NetworkTable.getTable('dash')
+        self.table = NetworkTables.getTable("SmartDashboard")
         self.robot_drive = wpilib.RobotDrive(0,1)
         self.stick = wpilib.Joystick(0)
         self.climbingMotor = wpilib.Talon(2)
@@ -66,16 +67,16 @@ class MyRobot(wpilib.IterativeRobot):
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
             self.gearMotor2.set(wpilib.Relay.Value.kForward)
 
-        #table.putNumber('stickX', self.stick.getX())
-        #table.putNumber('stickY', self.stick.getY())
-        #table.putNumber('Switch1', self.gearSwitch1.get())
-        #table.putNumber('Switch2', self.gearSwitch2.get())
-        #table.putNumber('Switch3', self.gearSwitch3.get())
-        #table.putNumber('Switch4', self.gearSwitch4.get())
-        #table.putNumber('GearMotor1 Forward', self.gearMotor1.set(wpilib.Relay.Value.kForward))
-        #table.putNumber('GearMotor2 Forward', self.gearMotor2.set(wpilib.Relay.Value.kForward))
-        #table.putNumber('GearMotor1 Reverse', self.gearMotor1.set(wpilib.Relay.Value.kReverse))
-        #table.putNumber('GearMotor2 Reverse', self.gearMotor2.set(wpilib.Relay.Value.kReverse))
+        self.table.putNumber('stickX', self.stick.getX())
+        self.table.putNumber('stickY', self.stick.getY())
+        self.table.putNumber('Switch1', self.gearSwitch1.get())
+        self.table.putNumber('Switch2', self.gearSwitch2.get())
+        self.table.putNumber('Switch3', self.gearSwitch3.get())
+        self.table.putNumber('Switch4', self.gearSwitch4.get())
+        self.table.putNumber('GearMotor1 Forward', self.gearMotor1.get())
+        self.table.putNumber('GearMotor2 Forward', self.gearMotor2.get())
+        self.table.putNumber('GearMotor1 Reverse', self.gearMotor1.get())
+        self.table.putNumber('GearMotor2 Reverse', self.gearMotor2.get())
         
     def testPeriodic(self):
         """This function is called periodically during test mode."""
