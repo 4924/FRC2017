@@ -14,12 +14,12 @@ class MyRobot(wpilib.IterativeRobot):
         self.robot_drive = wpilib.RobotDrive(0,1)
         self.stick = wpilib.Joystick(0)
         self.climbingMotor = wpilib.Talon(2)
-        self.gearSwitch1 = wpilib.DigitalInput(1)
-        self.gearSwitch2 = wpilib.DigitalInput(2)
-        self.gearSwitch3 = wpilib.DigitalInput(3)
-        self.gearSwitch4 = wpilib.DigitalInput(4)
-        self.gearMotor1 = wpilib.Relay(1)
-        self.gearMotor2 = wpilib.Relay(2)
+        self.gearSwitch1 = wpilib.DigitalInput(0)
+        self.gearSwitch2 = wpilib.DigitalInput(1)
+        self.gearSwitch3 = wpilib.DigitalInput(2)
+        self.gearSwitch4 = wpilib.DigitalInput(3)
+        self.gearMotor1 = wpilib.Relay(0)
+        self.gearMotor2 = wpilib.Relay(1)
                                 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -46,21 +46,22 @@ class MyRobot(wpilib.IterativeRobot):
         else:
             self.climbingMotor.set(0)
 
-        if not self.stick.getRawButton(1) and self.gearSwitch1.get():
-            self.gearMotor1.set(wpilib.Relay.Value.kOff)
-        elif not self.stick.getRawButton(1) and self.gearSwitch1.get():
-            self.gearMotor1.set(wpilib.Relay.Value.kForward)
-        elif self.stick.getRawButton(1) and self.gearSwitch2.get():
+
+        if self.stick.getRawButton(1) and self.gearSwitch2.get()== False:
             self.gearMotor1.set(wpilib.Relay.Value.kOff)
         elif self.stick.getRawButton(1) and self.gearSwitch2.get():
             self.gearMotor1.set(wpilib.Relay.Value.kReverse)
+        elif self.stick.getRawButton(1) == False and self.gearSwitch1.get()== False:
+            self.gearMotor1.set(wpilib.Relay.Value.kOff)
+        elif self.stick.getRawButton(1) == False and self.gearSwitch1.get():
+            self.gearMotor1.set(wpilib.Relay.Value.kForward)
         
     
-        if not self.stick.getRawButton(1) and self.gearSwitch3.get():
-            self.gearMotor2.wpilib.Relay.Value.kOff)
-        elif not self.stick.getRawButton(1) and self.gearSwitch3.get():
+        if self.stick.getRawButton(1) == False and self.gearSwitch3.get()== False:
+            self.gearMotor2.set(wpilib.Relay.Value.kOff)
+        elif self.stick.getRawButton(1) == False and self.gearSwitch3.get():
             self.gearMotor2.set(wpilib.Relay.Value.kReverse)
-        elif self.stick.getRawButton(1) and self.gearSwitch4.get():
+        elif self.stick.getRawButton(1) and self.gearSwitch4.get()== False:
             self.gearMotor2.set(wpilib.Relay.Value.kOff)            
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
             self.gearMotor2.set(wpilib.Relay.Value.kForward)
