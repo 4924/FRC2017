@@ -10,9 +10,14 @@ class MyRobot(wpilib.IterativeRobot):
         """
         self.robot_drive = wpilib.RobotDrive(0,1)
         self.stick = wpilib.Joystick(0)
-        self.rawButton = True
-        self.robotSpeed = False
-
+        self.climbingMotor = wpilib.Talon(2)
+        self.gearSwitch1 = wpilib.DigitalInput(1)
+        self.gearSwitch2 = wpilib.DigitalInput(2)
+        self.gearSwitch3 = wpilib.DigitalInput(3)
+        self.gearSwitch4 = wpilib.DigitalInput(4)
+        self.gearMotor1 = wpilib.Relay(1)
+        self.gearMotor2 = wpilib.Relay(2)
+                                
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
         self.auto_loop_counter = 0
@@ -30,21 +35,33 @@ class MyRobot(wpilib.IterativeRobot):
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
         
-        if(self.stick.getRawButton(0) and self.rawButton == True):
-            #clicked and value is true
-            self.robotSpeed = !self.robotSpeed
-            self.rawButton = False
-        elif(self.stick.getRawButton(0) and self.rawButton == False):
-            #clicked and value is false        
-        elif(!self.stick.getRawButton(0) and self.rawButton == False):
-            #not clicked and value is true
-            self.rawButton = True
-        
-        if(self.robotSpeed):
-            self.robot_drive.arcadeDrive(self.stick.getY(),self.stick.getX()) 
-        else: 
-            self.robot_drive.arcadeDrive(self.stick.getY()/2,self.stick.getX()/2)
+        self.robot_drive.arcadeDrive(self.stick.getY()/2,self.stick.getX()/2)
+        if self.stick.getRawButton(5):
+            self.climbingMotor.set(1)
+        elif self.stick.getRawButton(6):
+            self.climbingMotor.set(-1)
+        else:
+            self.climbingMotor.set(0)
 
+        if not self.stick.getRawButton(1) and self.gearSwitch1.get():
+            self.gearMotor1.set(wpilib.Relay.Value.kOff)
+        elif not self.stick.getRawButton(1) and self.gearSwitch1.get():
+            self.gearMotor1.set(wpilib.Relay.Value.kForward)
+        elif self.stick.getRawButton(1) and self.gearSwitch2.get():
+            self.gearMotor1.set(wpilib.Relay.Value.kOff)
+        elif self.stick.getRawButton(1) and self.gearSwitch2.get():
+            self.gearMotor1.set(wpilib.Relay.Value.kReverse)
+        
+    
+        if not self.stick.getRawButton(1) and self.gearSwitch3.get():
+            self.gearMotor2.wpilib.Relay.Value.kOff)
+        elif not self.stick.getRawButton(1) and self.gearSwitch3.get():
+            self.gearMotor2.set(wpilib.Relay.Value.kReverse)
+        elif self.stick.getRawButton(1) and self.gearSwitch4.get():
+            self.gearMotor2.set(wpilib.Relay.Value.kOff)            
+        elif self.stick.getRawButton(1) and self.gearSwitch4.get():
+            self.gearMotor2.set(wpilib.Relay.Value.kForward)
+        
     def testPeriodic(self):
         """This function is called periodically during test mode."""
         wpilib.LiveWindow.run()
