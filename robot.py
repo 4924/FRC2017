@@ -21,6 +21,10 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearSwitch4 = wpilib.DigitalInput(3)
         self.gearMotor1 = wpilib.Relay(0)
         self.gearMotor2 = wpilib.Relay(1)
+        self.gyro = wpilib.ADXRS450_Gyro(0)
+        self.accelerometer = wpilib.BuiltInAccelerometer(1)
+        self.are = []
+        self.counter = 0
                                 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -38,8 +42,24 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
+        if self.stick.getRawButton(4):
+            if self.counter < len(self.are):
+                self.robot_drive.arcadeDrive(self.are[self.counter][0],self.are[self.counter][1])
+                self.counter = self.counter + 1
+            else:
+                self.robot_drive.arcadeDrive(0,0)
+        else:
+            self.robot_drive.arcadeDrive(self.stick.getY(),self.stick.getX())
+     
         
-        self.robot_drive.arcadeDrive(self.stick.getY()/2,self.stick.getX()/2)
+
+        if self.stick.getRawButton(3):
+            self.are.append([self.stick.getY(), self.stick.getX()])
+
+        if self.stick.getRawButton(8):
+            self.are = []
+            self.counter = 0
+        
         if self.stick.getRawButton(5):
             self.climbingMotor.set(1)
         elif self.stick.getRawButton(6):
@@ -77,6 +97,12 @@ class MyRobot(wpilib.IterativeRobot):
         self.table.putNumber('GearMotor2 Forward', self.gearMotor2.get())
         self.table.putNumber('GearMotor1 Reverse', self.gearMotor1.get())
         self.table.putNumber('GearMotor2 Reverse', self.gearMotor2.get())
+        self.table.putNumber('GyroAngle', self.gyro.getAngle())
+        self.table.putNumber('GyroRate', self.gyro.getRate())
+        self.table.putNumber('AccelerometerX', round(self.accelerometer.getX(), 2))
+        self.table.putNumber('AccelerometerY', round(self.accelerometer.getY(), 2))
+        self.table.putNumber('AccelerometerZ', round(self.accelerometer.getZ(), 2))
+        #self.table.putInt('i', self.counter)
         
     def testPeriodic(self):
         """This function is called periodically during test mode."""
