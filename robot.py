@@ -44,12 +44,12 @@ class MyRobot(wpilib.IterativeRobot):
         """This function is called periodically during operator control."""
         if self.stick.getRawButton(4):
             if self.counter < len(self.are):
-                self.robot_drive.arcadeDrive(self.are[self.counter][0],self.are[self.counter][1])
+                self.robot_drive.arcadeDrive(0.75*self.are[self.counter][0],-0.75*self.are[self.counter][1])
                 self.counter = self.counter + 1
             else:
                 self.robot_drive.arcadeDrive(0,0)
         else:
-            self.robot_drive.arcadeDrive(self.stick.getY(),self.stick.getX())
+            self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
      
         
 
