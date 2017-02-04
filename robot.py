@@ -19,8 +19,11 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearSwitch2 = wpilib.DigitalInput(1)
         self.gearSwitch3 = wpilib.DigitalInput(2)
         self.gearSwitch4 = wpilib.DigitalInput(3)
+        self.ballSwitch1 = wpilib.DigitalInput(4)
+        self.ballSwitch2 = wpilib.DigitalInput(5)
         self.gearMotor1 = wpilib.Relay(0)
         self.gearMotor2 = wpilib.Relay(1)
+        self.ballMotor1 = wpilib.Relay(2)
         self.gyro = wpilib.ADXRS450_Gyro(0)
         self.accelerometer = wpilib.BuiltInAccelerometer(1)
         self.are = []
@@ -43,26 +46,8 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        if self.stick.getRawButton(4):
-            if self.counter < len(self.are):
-                self.robot_drive.arcadeDrive(0.75*self.are[self.counter][0],-0.75*self.are[self.counter][1])
-                self.counter = self.counter + 1
-            else:
-                self.robot_drive.arcadeDrive(0,0)
-        elif self.getRawButton(2):
-                self.robot_drive.arcadeDrive(0,self.camera)
-                
-        else:
-            self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
+        self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
      
-        
-
-        if self.stick.getRawButton(3):
-            self.are.append([self.stick.getY(), self.stick.getX()])
-
-        if self.stick.getRawButton(8):
-            self.are = []
-            self.counter = 0
         
         if self.stick.getRawButton(5):
             self.climbingMotor.set(1)
@@ -90,6 +75,15 @@ class MyRobot(wpilib.IterativeRobot):
             self.gearMotor2.set(wpilib.Relay.Value.kOff)            
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
             self.gearMotor2.set(wpilib.Relay.Value.kForward)
+
+        if self.stick.getRawButton(2) == False and self.ballSwitch1.get()== False:
+            self.ballMotor1.set(wpilib.Relay.Value.kOff)
+        elif self.stick.getRawButton(2) == False and self.ballSwitch1.get():
+            self.ballMotor1.set(wpilib.Relay.Value.kReverse)
+        elif self.stick.getRawButton(2) and self.ballSwitch2.get()== False:
+            self.ballMotor1.set(wpilib.Relay.Value.kOff)            
+        elif self.stick.getRawButton(2) and self.ballSwitch2.get():
+            self.ballMotor1.set(wpilib.Relay.Value.kForward)
 
         self.table.putNumber('stickX', self.stick.getX())
         self.table.putNumber('stickY', self.stick.getY())
