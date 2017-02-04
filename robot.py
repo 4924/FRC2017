@@ -25,6 +25,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.accelerometer = wpilib.BuiltInAccelerometer(1)
         self.are = []
         self.counter = 0
+        self.camera = 0
                                 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -48,6 +49,9 @@ class MyRobot(wpilib.IterativeRobot):
                 self.counter = self.counter + 1
             else:
                 self.robot_drive.arcadeDrive(0,0)
+        elif self.getRawButton(2):
+                self.robot_drive.arcadeDrive(0,self.camera)
+                
         else:
             self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
      
@@ -102,6 +106,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.table.putNumber('AccelerometerX', round(self.accelerometer.getX(), 2))
         self.table.putNumber('AccelerometerY', round(self.accelerometer.getY(), 2))
         self.table.putNumber('AccelerometerZ', round(self.accelerometer.getZ(), 2))
+        self.table.getNumber('CameraX', 0)
         #self.table.putInt('i', self.counter)
         
     def testPeriodic(self):
