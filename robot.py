@@ -21,14 +21,17 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearSwitch4 = wpilib.DigitalInput(3)
         self.ballSwitch1 = wpilib.DigitalInput(4)
         self.ballSwitch2 = wpilib.DigitalInput(5)
-        self.gearMotor1 = wpilib.Relay(0)
-        self.gearMotor2 = wpilib.Relay(1)
+        self.gearMotor1 = wpilib.Talon(3)
+        self.gearMotor2 = wpilib.Talon(4)
         self.ballMotor1 = wpilib.Relay(2)
         self.gyro = wpilib.ADXRS450_Gyro(0)
         self.accelerometer = wpilib.BuiltInAccelerometer(1)
         self.are = []
         self.counter = 0
         self.camera = 0
+        self.gearSpeed = .5 
+        self.gearSpeedUp = True
+        self.gearSpeedDown = True
                                 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -58,32 +61,52 @@ class MyRobot(wpilib.IterativeRobot):
 
 
         if self.stick.getRawButton(1) and self.gearSwitch2.get()== False:
-            self.gearMotor1.set(wpilib.Relay.Value.kOff)
+            self.gearMotor1.set(0)
         elif self.stick.getRawButton(1) and self.gearSwitch2.get():
-            self.gearMotor1.set(wpilib.Relay.Value.kReverse)
+            self.gearMotor1.set(-self.gearSpeed)
         elif self.stick.getRawButton(1) == False and self.gearSwitch1.get()== False:
-            self.gearMotor1.set(wpilib.Relay.Value.kOff)
+            self.gearMotor1.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch1.get():
-            self.gearMotor1.set(wpilib.Relay.Value.kForward)
+            self.gearMotor1.set(self.gearSpeed)
         
     
         if self.stick.getRawButton(1) == False and self.gearSwitch3.get()== False:
-            self.gearMotor2.set(wpilib.Relay.Value.kOff)
+            self.gearMotor2.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch3.get():
-            self.gearMotor2.set(wpilib.Relay.Value.kReverse)
+            self.gearMotor2.set(-self.gearSpeed)
         elif self.stick.getRawButton(1) and self.gearSwitch4.get()== False:
-            self.gearMotor2.set(wpilib.Relay.Value.kOff)            
+            self.gearMotor2.set(0)            
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
-            self.gearMotor2.set(wpilib.Relay.Value.kForward)
+            self.gearMotor2.set(self.gearSpeed)
 
-        if self.stick.getRawButton(2) == False and self.ballSwitch1.get()== False:
+        if self.stick.getRawButton(2) == False and self.ballSwitch1.get():
             self.ballMotor1.set(wpilib.Relay.Value.kOff)
-        elif self.stick.getRawButton(2) == False and self.ballSwitch1.get():
+        elif self.stick.getRawButton(2) == False and self.ballSwitch1.get() == False:
             self.ballMotor1.set(wpilib.Relay.Value.kReverse)
-        elif self.stick.getRawButton(2) and self.ballSwitch2.get()== False:
-            self.ballMotor1.set(wpilib.Relay.Value.kOff)            
         elif self.stick.getRawButton(2) and self.ballSwitch2.get():
+            self.ballMotor1.set(wpilib.Relay.Value.kOff)            
+        elif self.stick.getRawButton(2) and self.ballSwitch2.get()== False:
             self.ballMotor1.set(wpilib.Relay.Value.kForward)
+
+        if self.stick.getRawButton(9) == False and self.gearSpeedDown:
+            pass
+        elif self.stick.getRawButton(9) == False and self.gearSpeedDown == False:
+            self.gearSpeedDown = True
+        elif self.stick.getRawButton(9) and self.gearSpeedDown:
+            self.gearSpeed = self.gearSpeed -.05
+            self.gearSpeedDown = False
+        elif self.stick.getRawButton(9) and self.gearSpeedDown == False:
+            pass
+
+        if self.stick.getRawButton(10) == False and self.gearSpeedUp:
+            pass
+        elif self.stick.getRawButton(10) == False and self.gearSpeedUp == False:
+            self.gearSpeedUp = True
+        elif self.stick.getRawButton(10) and self.gearSpeedUp:
+            self.gearSpeed = self.gearSpeed +.05
+            self.gearSpeedUp = False
+        elif self.stick.getRawButton(10) and self.gearSpeedUp == False:
+            pass
 
         self.table.putNumber('stickX', self.stick.getX())
         self.table.putNumber('stickY', self.stick.getY())
@@ -101,6 +124,8 @@ class MyRobot(wpilib.IterativeRobot):
         self.table.putNumber('AccelerometerY', round(self.accelerometer.getY(), 2))
         self.table.putNumber('AccelerometerZ', round(self.accelerometer.getZ(), 2))
         self.table.getNumber('CameraX', 0)
+        self.table.putBoolean('ballSwitch1', self.ballSwitch1.get())
+        self.table.putBoolean('ballSwitch2', self.ballSwitch2.get())
         #self.table.putInt('i', self.counter)
         
     def testPeriodic(self):
