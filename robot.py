@@ -21,8 +21,8 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearSwitch4 = wpilib.DigitalInput(3)
         self.ballSwitch1 = wpilib.DigitalInput(4)
         self.ballSwitch2 = wpilib.DigitalInput(5)
-        self.gearMotor1 = wpilib.Talon(3)
-        self.gearMotor2 = wpilib.Talon(4)
+        self.gearMotor1 = wpilib.Victor(7)
+        self.gearMotor2 = wpilib.Victor(8)
         self.ballMotor1 = wpilib.Relay(2)
         self.gyro = wpilib.ADXRS450_Gyro(0)
         self.accelerometer = wpilib.BuiltInAccelerometer(1)
@@ -43,7 +43,7 @@ class MyRobot(wpilib.IterativeRobot):
         # Check if we've completed 100 loops (approximately 2 seconds)
         if self.auto_loop_counter < 100:
             self.robot_drive.drive(-0.5, 0) # Drive forwards at half speed
-            self.auto_loop_counter += 1
+            self.auto_loop_counter += 1;
         else:
             self.robot_drive.drive(0, 0)    #Stop robot
 
