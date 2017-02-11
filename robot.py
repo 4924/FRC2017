@@ -5,7 +5,10 @@ from networktables import NetworkTables
 
 
 class MyRobot(wpilib.IterativeRobot):
-
+    kP = 0.03
+    kI = 0.00
+    kD = 0.00
+    kF = 0.00
     def robotInit(self):
         """
         This function is called upon program startup and
@@ -32,6 +35,15 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearSpeed = .5 
         self.gearSpeedUp = True
         self.gearSpeedDown = True
+        self.rotateToAngleRate = 0
+
+        turnController = wpilib.PIDController(self.kP, self.kI, self.kD, self.kF, self.gyro, output=self)
+        turnController.setInputRange(-180.0,  180.0)
+        turnController.setOutputRange(-1.0, 1.0)
+        turnController.setAbsoluteTolerance(self.kToleranceDegrees)
+        turnController.setContinuous(True)
+        
+        self.turnController = turnController
                                 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -49,7 +61,30 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
+        rotateToAngle = False
+
+        if self.stick.getRawButton(2):
+            self.turnController.setSetpoint(0.0)
+            rotateToAngle = True
+        elif self.stick.getRawButton(3):
+            self.turnController.setSetpoint(90.0)
+            rotateToAngle = True
+        elif self.stick.getRawButton(4):
+            self.turnController.setSetpoint(179.9)
+            rotateToAngle = True
+        elif self.stick.getRawButton(5):
+            self.turnController.setSetpoint(-90.0)
+            rotateToAngle = True
+            
+        if rotateToAngle:
+            self.turnController.enable()
+            currentRotationRate = self.rotateToAngleRate
+        else:
+            self.turnController.disable()
+            currentRotationRate = -0.75*self.stick.getX()
+
+        self.robot_drive.arcadeDrive(0.75*self.stick.getY(),currentRotationRate)
+        
      
         
         if self.stick.getRawButton(5):
@@ -127,6 +162,12 @@ class MyRobot(wpilib.IterativeRobot):
         self.table.putBoolean('ballSwitch1', self.ballSwitch1.get())
         self.table.putBoolean('ballSwitch2', self.ballSwitch2.get())
         #self.table.putInt('i', self.counter)
+
+    def pidWrite(self, output):
+        """This function is invoked periodically by the PID Controller,
+        based upon navX MXP yaw angle input and PID Coefficients.
+        """
+        self.rotateToAngleRate = output
         
     def testPeriodic(self):
         """This function is called periodically during test mode."""
