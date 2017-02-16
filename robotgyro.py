@@ -5,6 +5,10 @@ from networktables import NetworkTables
 
 
 class MyRobot(wpilib.IterativeRobot):
+    kP = 0.03
+    kI = 0.00
+    kD = 0.00
+    kF = 0.00
     def robotInit(self):
         """
         This function is called upon program startup and
@@ -20,16 +24,26 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearSwitch4 = wpilib.DigitalInput(3)
         self.ballSwitch1 = wpilib.DigitalInput(4)
         self.ballSwitch2 = wpilib.DigitalInput(5)
-        self.gearMotor1 = wpilib.Spark(4)
-        self.gearMotor2 = wpilib.Spark(3)
-        self.ballMotor1 = wpilib.Relay(0)
+        self.gearMotor1 = wpilib.Victor(7)
+        self.gearMotor2 = wpilib.Victor(8)
+        self.ballMotor1 = wpilib.Relay(2)
+        self.gyro = wpilib.ADXRS450_Gyro(0)
+        self.accelerometer = wpilib.BuiltInAccelerometer(1)
+        self.are = []
+        self.counter = 0
+        self.camera = 0
         self.gearSpeed = .5 
         self.gearSpeedUp = True
         self.gearSpeedDown = True
-        self.lights = wpilib.Relay(1)
-        self.lightToggle = False
-        self.lightToggleBool = True
+        self.rotateToAngleRate = 0
 
+        turnController = wpilib.PIDController(self.kP, self.kI, self.kD, self.kF, self.gyro, output=self)
+        turnController.setInputRange(-180.0,  180.0)
+        turnController.setOutputRange(-1.0, 1.0)
+        turnController.setAbsoluteTolerance(5)
+        turnController.setContinuous(True)
+        
+        self.turnController = turnController
                                 
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -47,55 +61,66 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
+        rotateToAngle = False
+
+        if self.stick.getRawButton(2):
+            self.turnController.setSetpoint(0.0)
+            rotateToAngle = True
+        elif self.stick.getRawButton(3):
+            self.turnController.setSetpoint(90.0)
+            rotateToAngle = True
+        elif self.stick.getRawButton(4):
+            self.turnController.setSetpoint(179.9)
+            rotateToAngle = True
+        elif self.stick.getRawButton(5):
+            self.turnController.setSetpoint(-90.0)
+            rotateToAngle = True
+            
+        if rotateToAngle:
+            self.turnController.enable()
+            currentRotationRate = self.rotateToAngleRate
+        else:
+            self.turnController.disable()
+            currentRotationRate = -0.75*self.stick.getX()
+
+        self.robot_drive.arcadeDrive(0.75*self.stick.getY(),currentRotationRate)
         
      
         
-        if self.stick.getRawButton(3):
-            self.climbingMotor.set(-.3)
+        if self.stick.getRawButton(5):
+            self.climbingMotor.set(1)
+        elif self.stick.getRawButton(6):
+            self.climbingMotor.set(-1)
         else:
             self.climbingMotor.set(0)
-
-        if self.stick.getRawButton(4) and self.lightToggleBool == False:
-            pass
-        elif self.stick.getRawButton(4) and self.lightToggleBool:
-            self.lightToggle = not self.lightToggle
-            if self.lightToggle:
-                self.lights.set(wpilib.Relay.Value.kForward)
-            else:
-                self.lights.set(wpilib.Relay.Value.kOff)
-            self.lightToggleBool = False
-        elif self.stick.getRawButton(4) == False and self.lightToggleBool == False:
-            self.lightToggleBool = True
-    
 
 
         if self.stick.getRawButton(1) and self.gearSwitch2.get()== False:
             self.gearMotor1.set(0)
         elif self.stick.getRawButton(1) and self.gearSwitch2.get():
-            self.gearMotor1.set(self.gearSpeed)
+            self.gearMotor1.set(-self.gearSpeed)
         elif self.stick.getRawButton(1) == False and self.gearSwitch1.get()== False:
             self.gearMotor1.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch1.get():
-            self.gearMotor1.set(-self.gearSpeed)
+            self.gearMotor1.set(self.gearSpeed)
         
     
         if self.stick.getRawButton(1) == False and self.gearSwitch3.get()== False:
             self.gearMotor2.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch3.get():
-            self.gearMotor2.set(self.gearSpeed)
+            self.gearMotor2.set(-self.gearSpeed)
         elif self.stick.getRawButton(1) and self.gearSwitch4.get()== False:
             self.gearMotor2.set(0)            
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
-            self.gearMotor2.set(-self.gearSpeed)
+            self.gearMotor2.set(self.gearSpeed)
 
-        if self.stick.getRawButton(2) == False and self.ballSwitch1.get()==False:
+        if self.stick.getRawButton(2) == False and self.ballSwitch1.get():
             self.ballMotor1.set(wpilib.Relay.Value.kOff)
-        elif self.stick.getRawButton(2) == False and self.ballSwitch1.get():
+        elif self.stick.getRawButton(2) == False and self.ballSwitch1.get() == False:
             self.ballMotor1.set(wpilib.Relay.Value.kReverse)
-        elif self.stick.getRawButton(2) and self.ballSwitch2.get()==False:
-            self.ballMotor1.set(wpilib.Relay.Value.kOff)            
         elif self.stick.getRawButton(2) and self.ballSwitch2.get():
+            self.ballMotor1.set(wpilib.Relay.Value.kOff)            
+        elif self.stick.getRawButton(2) and self.ballSwitch2.get()== False:
             self.ballMotor1.set(wpilib.Relay.Value.kForward)
 
         if self.stick.getRawButton(9) == False and self.gearSpeedDown:
@@ -128,6 +153,15 @@ class MyRobot(wpilib.IterativeRobot):
         self.table.putNumber('GearMotor2 Forward', self.gearMotor2.get())
         self.table.putNumber('GearMotor1 Reverse', self.gearMotor1.get())
         self.table.putNumber('GearMotor2 Reverse', self.gearMotor2.get())
+        self.table.putNumber('GyroAngle', self.gyro.getAngle())
+        self.table.putNumber('GyroRate', self.gyro.getRate())
+        self.table.putNumber('AccelerometerX', round(self.accelerometer.getX(), 2))
+        self.table.putNumber('AccelerometerY', round(self.accelerometer.getY(), 2))
+        self.table.putNumber('AccelerometerZ', round(self.accelerometer.getZ(), 2))
+        self.table.getNumber('CameraX', 0)
+        self.table.putBoolean('ballSwitch1', self.ballSwitch1.get())
+        self.table.putBoolean('ballSwitch2', self.ballSwitch2.get())
+        #self.table.putInt('i', self.counter)
 
     def pidWrite(self, output):
         """This function is invoked periodically by the PID Controller,
