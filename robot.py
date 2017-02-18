@@ -23,9 +23,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearMotor1 = wpilib.Spark(4)
         self.gearMotor2 = wpilib.Spark(3)
         self.ballMotor1 = wpilib.Relay(0)
-        self.gearSpeed = .5 
-        self.gearSpeedUp = True
-        self.gearSpeedDown = True
+        self.gearSpeed = .5
         self.lights = wpilib.Relay(1)
         self.lightToggle = False
         self.lightToggleBool = True
@@ -73,21 +71,21 @@ class MyRobot(wpilib.IterativeRobot):
         if self.stick.getRawButton(1) and self.gearSwitch2.get()== False:
             self.gearMotor1.set(0)
         elif self.stick.getRawButton(1) and self.gearSwitch2.get():
-            self.gearMotor1.set(self.gearSpeed)
+            self.gearMotor1.set(.5)
         elif self.stick.getRawButton(1) == False and self.gearSwitch1.get()== False:
             self.gearMotor1.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch1.get():
-            self.gearMotor1.set(-self.gearSpeed)
+            self.gearMotor1.set(-.5)
         
     
         if self.stick.getRawButton(1) == False and self.gearSwitch3.get()== False:
             self.gearMotor2.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch3.get():
-            self.gearMotor2.set(self.gearSpeed)
+            self.gearMotor2.set(.5)
         elif self.stick.getRawButton(1) and self.gearSwitch4.get()== False:
             self.gearMotor2.set(0)            
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
-            self.gearMotor2.set(-self.gearSpeed)
+            self.gearMotor2.set(-.5)
 
         if self.stick.getRawButton(2) == False and self.ballSwitch1.get()==False:
             self.ballMotor1.set(wpilib.Relay.Value.kOff)
@@ -97,26 +95,6 @@ class MyRobot(wpilib.IterativeRobot):
             self.ballMotor1.set(wpilib.Relay.Value.kOff)            
         elif self.stick.getRawButton(2) and self.ballSwitch2.get():
             self.ballMotor1.set(wpilib.Relay.Value.kForward)
-
-        if self.stick.getRawButton(9) == False and self.gearSpeedDown:
-            pass
-        elif self.stick.getRawButton(9) == False and self.gearSpeedDown == False:
-            self.gearSpeedDown = True
-        elif self.stick.getRawButton(9) and self.gearSpeedDown:
-            self.gearSpeed = self.gearSpeed -.05
-            self.gearSpeedDown = False
-        elif self.stick.getRawButton(9) and self.gearSpeedDown == False:
-            pass
-
-        if self.stick.getRawButton(10) == False and self.gearSpeedUp:
-            pass
-        elif self.stick.getRawButton(10) == False and self.gearSpeedUp == False:
-            self.gearSpeedUp = True
-        elif self.stick.getRawButton(10) and self.gearSpeedUp:
-            self.gearSpeed = self.gearSpeed +.05
-            self.gearSpeedUp = False
-        elif self.stick.getRawButton(10) and self.gearSpeedUp == False:
-            pass
 
         self.table.putNumber('stickX', self.stick.getX())
         self.table.putNumber('stickY', self.stick.getY())
