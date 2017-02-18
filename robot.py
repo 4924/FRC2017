@@ -47,7 +47,11 @@ class MyRobot(wpilib.IterativeRobot):
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
-        self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
+        if self.stick.getRawButton(9):
+            self.robot_drive.arcadeDrive(1*self.stick.getY(),-1*self.stick.getX())
+        else:
+            self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
+
         
      
         
@@ -129,12 +133,6 @@ class MyRobot(wpilib.IterativeRobot):
         self.table.putNumber('GearMotor1 Reverse', self.gearMotor1.get())
         self.table.putNumber('GearMotor2 Reverse', self.gearMotor2.get())
 
-    def pidWrite(self, output):
-        """This function is invoked periodically by the PID Controller,
-        based upon navX MXP yaw angle input and PID Coefficients.
-        """
-        self.rotateToAngleRate = output
-        
     def testPeriodic(self):
         """This function is called periodically during test mode."""
         wpilib.LiveWindow.run()
