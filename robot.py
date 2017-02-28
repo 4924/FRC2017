@@ -27,6 +27,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.lights = wpilib.Relay(1)
         self.lightToggle = False
         self.lightToggleBool = True
+        self.togglev = 0
 
                                 
     def autonomousInit(self):
@@ -46,11 +47,16 @@ class MyRobot(wpilib.IterativeRobot):
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
         if self.stick.getRawButton(5):
-            self.robot_drive.arcadeDrive(0.75*self.stick.getY(), self.table.getNumber("cameraX", 0))
+            if self.togglev == 0:
+                self.robot_drive.arcadeDrive(-0.75*self.stick.getY(), self.table.getNumber("cameraX", 0)/2)
+                self.togglev = 1
+            else:
+                self.robot_drive.arcadeDrive(-0.75*self.stick.getY(), self.table.getNumber("cameraX", 0))
+                self.togglev = 0
         elif self.stick.getRawButton(9):
-            self.robot_drive.arcadeDrive(1*self.stick.getY(),-1*self.stick.getX())
+            self.robot_drive.arcadeDrive(-1*self.stick.getY(),-1*self.stick.getX())
         else:
-            self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
+            self.robot_drive.arcadeDrive(-0.75*self.stick.getY(),-0.75*self.stick.getX())
 
         
      
