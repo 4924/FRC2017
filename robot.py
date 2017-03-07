@@ -23,6 +23,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearMotor1 = wpilib.Spark(4)
         self.gearMotor2 = wpilib.Spark(3)
         self.ballMotor1 = wpilib.Relay(0)
+        self.gyro = wpilib.ADXRS450_Gyro(0)
         self.gearSpeed = .5
         self.lights = wpilib.Relay(1)
         self.lightToggle = False
@@ -38,8 +39,8 @@ class MyRobot(wpilib.IterativeRobot):
         """This function is called periodically during autonomous."""
 
         # Check if we've completed 100 loops (approximately 2 seconds)
-        if self.auto_loop_counter < 100:
-            self.robot_drive.drive(-0.5, 0) # Drive forwards at half speed
+        if self.auto_loop_counter < 80:
+            self.robot_drive.drive(-0.4, -self.gyro.getAngle()*10) # Drive forwards at half speed
             self.auto_loop_counter += 1;
         else:
             self.robot_drive.drive(0, 0)    #Stop robot
@@ -93,11 +94,11 @@ class MyRobot(wpilib.IterativeRobot):
         if self.stick.getRawButton(1) == False and self.gearSwitch3.get()== False:
             self.gearMotor2.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch3.get():
-            self.gearMotor2.set(.5)
+            self.gearMotor2.set(1)
         elif self.stick.getRawButton(1) and self.gearSwitch4.get()== False:
             self.gearMotor2.set(0)            
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
-            self.gearMotor2.set(-.5)
+            self.gearMotor2.set(-1)
 
         if self.stick.getRawButton(2) == False and self.ballSwitch1.get()==False:
             self.ballMotor1.set(wpilib.Relay.Value.kOff)
@@ -118,6 +119,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.table.putNumber('GearMotor2 Forward', self.gearMotor2.get())
         self.table.putNumber('GearMotor1 Reverse', self.gearMotor1.get())
         self.table.putNumber('GearMotor2 Reverse', self.gearMotor2.get())
+        self.table.putNumber('gyro', self.gyro.getAngle())
 
     def testPeriodic(self):
         """This function is called periodically during test mode."""

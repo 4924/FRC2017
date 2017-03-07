@@ -2,12 +2,10 @@
 import wpilib
 from networktables import NetworkTables
 
-
-
 class MyRobot(wpilib.IterativeRobot):
-    kP = 0.03
-    kI = 0.00
-    kD = 0.00
+    kP = 0.01
+    kI = 0.02
+    kD = 0.03
     kF = 0.00
     def robotInit(self):
         """
@@ -37,7 +35,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearSpeedDown = True
         self.rotateToAngleRate = 0
 
-        turnController = wpilib.PIDController(self.kP, self.kI, self.kD, self.kF, self.gyro, output=self)
+        turnController = wpilib.PIDController(self.kP, self.kI, self.kD, self.kF, self.gyro.getAngle, output=self)
         turnController.setInputRange(-180.0,  180.0)
         turnController.setOutputRange(-1.0, 1.0)
         turnController.setAbsoluteTolerance(5)
@@ -84,76 +82,10 @@ class MyRobot(wpilib.IterativeRobot):
             currentRotationRate = -0.75*self.stick.getX()
 
         self.robot_drive.arcadeDrive(0.75*self.stick.getY(),currentRotationRate)
-        
-     
-        
-        if self.stick.getRawButton(5):
-            self.climbingMotor.set(1)
-        elif self.stick.getRawButton(6):
-            self.climbingMotor.set(-1)
-        else:
-            self.climbingMotor.set(0)
+ 
 
-
-        if self.stick.getRawButton(1) and self.gearSwitch2.get()== False:
-            self.gearMotor1.set(0)
-        elif self.stick.getRawButton(1) and self.gearSwitch2.get():
-            self.gearMotor1.set(-self.gearSpeed)
-        elif self.stick.getRawButton(1) == False and self.gearSwitch1.get()== False:
-            self.gearMotor1.set(0)
-        elif self.stick.getRawButton(1) == False and self.gearSwitch1.get():
-            self.gearMotor1.set(self.gearSpeed)
-        
-    
-        if self.stick.getRawButton(1) == False and self.gearSwitch3.get()== False:
-            self.gearMotor2.set(0)
-        elif self.stick.getRawButton(1) == False and self.gearSwitch3.get():
-            self.gearMotor2.set(-self.gearSpeed)
-        elif self.stick.getRawButton(1) and self.gearSwitch4.get()== False:
-            self.gearMotor2.set(0)            
-        elif self.stick.getRawButton(1) and self.gearSwitch4.get():
-            self.gearMotor2.set(self.gearSpeed)
-
-        if self.stick.getRawButton(2) == False and self.ballSwitch1.get():
-            self.ballMotor1.set(wpilib.Relay.Value.kOff)
-        elif self.stick.getRawButton(2) == False and self.ballSwitch1.get() == False:
-            self.ballMotor1.set(wpilib.Relay.Value.kReverse)
-        elif self.stick.getRawButton(2) and self.ballSwitch2.get():
-            self.ballMotor1.set(wpilib.Relay.Value.kOff)            
-        elif self.stick.getRawButton(2) and self.ballSwitch2.get()== False:
-            self.ballMotor1.set(wpilib.Relay.Value.kForward)
-
-        if self.stick.getRawButton(9) == False and self.gearSpeedDown:
-            pass
-        elif self.stick.getRawButton(9) == False and self.gearSpeedDown == False:
-            self.gearSpeedDown = True
-        elif self.stick.getRawButton(9) and self.gearSpeedDown:
-            self.gearSpeed = self.gearSpeed -.05
-            self.gearSpeedDown = False
-        elif self.stick.getRawButton(9) and self.gearSpeedDown == False:
-            pass
-
-        if self.stick.getRawButton(10) == False and self.gearSpeedUp:
-            pass
-        elif self.stick.getRawButton(10) == False and self.gearSpeedUp == False:
-            self.gearSpeedUp = True
-        elif self.stick.getRawButton(10) and self.gearSpeedUp:
-            self.gearSpeed = self.gearSpeed +.05
-            self.gearSpeedUp = False
-        elif self.stick.getRawButton(10) and self.gearSpeedUp == False:
-            pass
-
-        self.table.putNumber('stickX', self.stick.getX())
-        self.table.putNumber('stickY', self.stick.getY())
-        self.table.putNumber('Switch1', self.gearSwitch1.get())
-        self.table.putNumber('Switch2', self.gearSwitch2.get())
-        self.table.putNumber('Switch3', self.gearSwitch3.get())
-        self.table.putNumber('Switch4', self.gearSwitch4.get())
-        self.table.putNumber('GearMotor1 Forward', self.gearMotor1.get())
-        self.table.putNumber('GearMotor2 Forward', self.gearMotor2.get())
-        self.table.putNumber('GearMotor1 Reverse', self.gearMotor1.get())
-        self.table.putNumber('GearMotor2 Reverse', self.gearMotor2.get())
-        self.table.putNumber('GyroAngle', self.gyro.getAngle())
+        self.table.putNumber('rot', self.rotateToAngleRate)
+        self.table.putNumber('cur', currentRotationRate)
         self.table.putNumber('GyroRate', self.gyro.getRate())
         self.table.putNumber('AccelerometerX', round(self.accelerometer.getX(), 2))
         self.table.putNumber('AccelerometerY', round(self.accelerometer.getY(), 2))
@@ -168,7 +100,10 @@ class MyRobot(wpilib.IterativeRobot):
         based upon navX MXP yaw angle input and PID Coefficients.
         """
         self.rotateToAngleRate = output
-        
+
+    def pidOutput(self):
+        return self.gyro.getAngle()
+    
     def testPeriodic(self):
         """This function is called periodically during test mode."""
         wpilib.LiveWindow.run()
