@@ -39,11 +39,15 @@ class MyRobot(wpilib.IterativeRobot):
         """This function is called periodically during autonomous."""
 
         # Check if we've completed 100 loops (approximately 2 seconds)
-        if self.auto_loop_counter < 80:
-            self.robot_drive.drive(-0.4, -self.gyro.getAngle()*10) # Drive forwards at half speed
+        if self.auto_loop_counter < 100:
+            self.robot_drive.arcadeDrive(-0.6, -self.gyro.getAngle()*0.05) # Drive forwards at half speed
+            self.auto_loop_counter += 1;
+        elif self.auto_loop_counter < 265:
+            self.robot_drive.arcadeDrive(.3, -(self.gyro.getAngle()+70)*0.01)    #Stop robot
             self.auto_loop_counter += 1;
         else:
-            self.robot_drive.drive(0, 0)    #Stop robot
+            self.robot_drive.drive(0, 0)
+            
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
