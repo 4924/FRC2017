@@ -24,7 +24,7 @@ class MyRobot(wpilib.IterativeRobot):
         self.gearMotor2 = wpilib.Spark(3)
         self.ballMotor1 = wpilib.Relay(0)
         self.gyro = wpilib.ADXRS450_Gyro(0)
-        self.gearSpeed = .5
+        self.gearSpeed = 1
         self.lights = wpilib.Relay(1)
         self.lightToggle = False
         self.lightToggleBool = True
@@ -32,7 +32,7 @@ class MyRobot(wpilib.IterativeRobot):
         wpilib.CameraServer.launch()
         self.ultrasonic = wpilib.AnalogInput(0)
 
-                                
+
     def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
         self.auto_loop_counter = 0
@@ -40,70 +40,62 @@ class MyRobot(wpilib.IterativeRobot):
     def autonomousPeriodic(self):
         """This function is called periodically during autonomous."""
 
-        # Check if we've completed 100 loops (approximately 2 seconds)
-        if self.auto_loop_counter < 130:
-            self.robot_drive.arcadeDrive(0.55, -self.gyro.getAngle()*0.05) # Drive forwards at half speed
+        #Check if we've completed 100 loops (approximately 2 seconds)
+        if self.auto_loop_counter < 150:
+            #self.robot_drive.arcadeDrive(-0.55, self.gyro.getAngle()*0.05) # Drive forwards at half speed
+            #self.robot_drive.arcadeDrive(0, self.gyro.getAngle()*0.05)
+            self.robot_drive.arcadeDrive(-0.55, 0)
             self.auto_loop_counter += 1;
-        elif self.auto_loop_counter < 260:
-            self.robot_drive.arcadeDrive(0, -(self.gyro.getAngle()+55)*0.01)    #Stop robot
-            self.auto_loop_counter += 1;
-        elif self.ultrasonic.getVoltage() > 0.3 and self.auto_loop_counter < 265:
-            if self.togglev == 0:
-                self.robot_drive.arcadeDrive(0.5, self.table.getNumber("cameraX", 0)/2)
-                self.togglev = 1
-            else:
-                self.robot_drive.arcadeDrive(0.5, self.table.getNumber("cameraX", 0))
-                self.togglev = 0
-        elif self.gearSwitch4.get() or self.gearSwitch2.get():
-            self.gearMotor1.set(.5)
-            self.gearMotor2.set(-.5)
-            self.auto_loop_counter = 270;
-        elif self.auto_loop_counter < 300:
-            self.gearMotor1.set(0)
-            self.gearMotor2.set(0)
-            self.robot_drive.arcadeDrive(0, 0)
-            self.auto_loop_counter += 1;
-        elif self.auto_loop_counter < 380:
-            self.robot_drive.arcadeDrive(-0.5, 0)
-            self.auto_loop_counter += 1;
+        #elif self.auto_loop_counter < 290:
+        #    self.robot_drive.arcadeDrive(0, -(self.gyro.getAngle()+55)*0.009)    #Stop robot
+        #    self.auto_loop_counter += 1;
+        #elif self.ultrasonic.getVoltage() > 0.3 and self.auto_loop_counter < 295:
+        #    if self.togglev == 0:
+        #        self.robot_drive.arcadeDrive(0.5, self.table.getNumber("cameraX", 0)/2)
+        #        self.togglev = 1
+        #    else:
+        #        self.robot_drive.arcadeDrive(0.5, self.table.getNumber("cameraX", 0))
+        #        self.togglev = 0
+        #elif self.gearSwitch4.get() or self.gearSwitch2.get():
+        #    self.gearMotor1.set(.5)
+        #    self.gearMotor2.set(-.5)
+        #    self.auto_loop_counter = 270;
+        #elif self.auto_loop_counter < 330:
+        #    self.gearMotor1.set(0)
+        #    self.gearMotor2.set(0)
+        #    self.robot_drive.arcadeDrive(0, 0)
+        #    self.auto_loop_counter += 1;
+        #elif self.auto_loop_counter < 410:
+        #    self.robot_drive.arcadeDrive(-0.5, 0)
+        #    self.auto_loop_counter += 1;
         else:
             self.robot_drive.arcadeDrive(0, 0)
-            
+
 
     def teleopPeriodic(self):
         """This function is called periodically during operator control."""
         if self.stick.getRawButton(5):
             if self.togglev == 0:
-                self.robot_drive.arcadeDrive(-0.75*self.stick.getY(), self.table.getNumber("cameraX", 0)/1.6)
+                self.robot_drive.arcadeDrive(0.75*self.stick.getY(), self.table.getNumber("cameraX", 0)/1.6)
                 self.togglev = 1
             else:
-                self.robot_drive.arcadeDrive(-0.75*self.stick.getY(), self.table.getNumber("cameraX", 0)*1.4)
+                self.robot_drive.arcadeDrive(0.75*self.stick.getY(), self.table.getNumber("cameraX", 0)*1.4)
                 self.togglev = 0
         elif self.stick.getRawButton(9):
-            self.robot_drive.arcadeDrive(-1*self.stick.getY(),-1*self.stick.getX())
+            self.robot_drive.arcadeDrive(1*self.stick.getY(),-1*self.stick.getX())
         else:
-            self.robot_drive.arcadeDrive(-0.75*self.stick.getY(),-0.75*self.stick.getX())
+            self.robot_drive.arcadeDrive(0.75*self.stick.getY(),-0.75*self.stick.getX())
 
-        
-     
-        
+
+
+
         if self.stick.getRawButton(3):
-            self.climbingMotor.set(-.3)
+            self.climbingMotor.set(-1)
+        elif self.stick.getRawButton(4):
+            self.climbingMotor.set(-0.4)
         else:
             self.climbingMotor.set(0)
 
-        if self.stick.getRawButton(4) and self.lightToggleBool == False:
-            pass
-        elif self.stick.getRawButton(4) and self.lightToggleBool:
-            self.lightToggle = not self.lightToggle
-            if self.lightToggle:
-                self.lights.set(wpilib.Relay.Value.kForward)
-            else:
-                self.lights.set(wpilib.Relay.Value.kOff)
-            self.lightToggleBool = False
-        elif self.stick.getRawButton(4) == False and self.lightToggleBool == False:
-            self.lightToggleBool = True
-    
 
 
         if self.stick.getRawButton(1) and self.gearSwitch2.get()== False:
@@ -114,14 +106,14 @@ class MyRobot(wpilib.IterativeRobot):
             self.gearMotor1.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch1.get():
             self.gearMotor1.set(-.5)
-        
-    
+
+
         if self.stick.getRawButton(1) == False and self.gearSwitch3.get()== False:
             self.gearMotor2.set(0)
         elif self.stick.getRawButton(1) == False and self.gearSwitch3.get():
             self.gearMotor2.set(.5)
         elif self.stick.getRawButton(1) and self.gearSwitch4.get()== False:
-            self.gearMotor2.set(0)            
+            self.gearMotor2.set(0)
         elif self.stick.getRawButton(1) and self.gearSwitch4.get():
             self.gearMotor2.set(-.5)
 
@@ -130,7 +122,7 @@ class MyRobot(wpilib.IterativeRobot):
         elif self.stick.getRawButton(2) == False and self.ballSwitch1.get():
             self.ballMotor1.set(wpilib.Relay.Value.kReverse)
         elif self.stick.getRawButton(2) and self.ballSwitch2.get()==False:
-            self.ballMotor1.set(wpilib.Relay.Value.kOff)            
+            self.ballMotor1.set(wpilib.Relay.Value.kOff)
         elif self.stick.getRawButton(2) and self.ballSwitch2.get():
             self.ballMotor1.set(wpilib.Relay.Value.kForward)
 
